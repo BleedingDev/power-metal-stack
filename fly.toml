@@ -1,4 +1,4 @@
-app = "indie-stack-template"
+app = "power-metal-stack-template"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
