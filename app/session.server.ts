@@ -1,5 +1,4 @@
-/* eslint-disable functional/no-throw-statement */
-import { createCookieSessionStorage, redirect } from "remix"
+import { createCookieSessionStorage, redirect } from "@remix-run/node"
 import invariant from "tiny-invariant"
 
 import type { User } from "~/models/user.server"
@@ -26,29 +25,28 @@ export async function getSession(request: Request) {
   return sessionStorage.getSession(cookie)
 }
 
-export async function getUserId(request: Request): Promise<string | undefined> {
+export async function getUserId(request: Request): Promise<User["id"] | undefined> {
   const session = await getSession(request)
   const userId = session.get(USER_SESSION_KEY)
   return userId
 }
 
-export async function getUser(request: Request): Promise<null | User> {
+export async function getUser(request: Request) {
   const userId = await getUserId(request)
   if (userId === undefined) return null
 
   const user = await getUserById(userId)
   if (user) return user
 
+  // eslint-disable-next-line functional/no-throw-statement
   throw await logout(request)
 }
 
-export async function requireUserId(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname,
-): Promise<string> {
+export async function requireUserId(request: Request, redirectTo: string = new URL(request.url).pathname) {
   const userId = await getUserId(request)
   if (!userId) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+    // eslint-disable-next-line functional/no-throw-statement
     throw redirect(`/login?${searchParams}`)
   }
   return userId
@@ -60,6 +58,7 @@ export async function requireUser(request: Request) {
   const user = await getUserById(userId)
   if (user) return user
 
+  // eslint-disable-next-line functional/no-throw-statement
   throw await logout(request)
 }
 
